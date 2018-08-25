@@ -57,6 +57,9 @@ var dbPromise = idb.open('couches-n-things', 2, function(upgradeDb) {
   }
 });
 ```
+
+keypath is like primary key. Once created you do not have to use value key syntax.
+
 ### adding items/objects to the object store
 
 
@@ -204,7 +207,100 @@ dbPromise.then(function(db) {
       document.getElementById('results').innerHTML = s;
     });
   }
+```
+
+New Section from Offline Course.
+
+--- 
+
+## Notes on keyValueStores
+
+This is a bit different from other dbs.
+Note Value, Key Syntax.
+This example shows how you create a db and a object store.
+
+```javascript
+import idb from 'idb';
+
+var dbPromise = idb.open('test-db', 1, function(upgradeDb){
+  var keyValStore = upgradeDb.createObjectStore('keyval');
+  keyValStore.put('world', 'hello');
+})
+```
+
+
+```javascript
+
+dbPromise.then(function(db) {
+	var tx = db.transaction("keyval");
+	var keyValStore = tx.objectStore('keyval');
+	return keyValStore.get('hello')
+		.then(val => console.log('this is the value', val))
+})
+
+// returns `world` to the console
+
+```
 
 
 
+
+---
+
+# PWA training section
+
+## Sw and IDB 
+
+Note use IDB on the activate event so you only create it once.
+
+sw.js
+```javascript
+
+self.addEventListener('activate', function(e) {
+	e.waitUntil(createDB());
+});
+
+function createDB(){
+  productsDB = idb.open('products', 1, upgradeDB => {
+    var store = upgradeDB.crateObjectStore('clothing', {
+      keyPath:'id'
+    });
+    store. put({
+      id:123,
+      name:'jacket',
+      price:50.20,
+      quanity:20
+    });
+  }) 
+}
+
+```
+Cache Event on the install event
+```javascript
+
+self.addEventListener('install', function(event){
+  event.waitUntil(
+    cacheAssets()
+  );
+});
+
+cacheAssets() => {
+  return caches.open('cache').then(cache=>cache.addAll([
+    'index.html',
+    'styles/main.css',
+    'js/offline.js',
+    'img/jacket.jpg'
+  ]))
+}
+```
+getting data for ui
+
+```javascript
+readDB()=>{
+  productsDB.then(
+    db=>{
+      db.transaction(['clothing'], 'readonly')
+    }
+  )
+}
 ```
