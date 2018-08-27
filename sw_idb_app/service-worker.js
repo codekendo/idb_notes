@@ -3,7 +3,7 @@
 (function(){
 
 if (typeof idb === "undefined") {
-self.importScripts('./idb.js');
+self.importScripts('./lib/idb.js');
 }
 
 self.addEventListener('activate', function(event) {
@@ -46,6 +46,17 @@ function updateDB(json){
         json.map(element => {
             store.put(element)
         });
+    })
+}
+
+function removeOldEntries(){
+    idb.open('products', 1)
+    .then(function(db){
+        var tx = db.transaction(['beverages', 'readwrite'])
+        var store = tx.objectStore('beverages');
+        console.log(store)
+
+
     })
 }
 

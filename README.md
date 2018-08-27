@@ -304,3 +304,26 @@ readDB()=>{
   )
 }
 ```
+
+
+
+
+---
+
+## Example of Deleting posts and keeping the 30 newest posts from an index of by-date
+This goes backwards assuming that 30 newest posts are at the bottom.
+Open cursor opens the cursor at the bottom goes up 30 posts.
+
+
+```javascript
+store.index('by-date').openCursor(null, 'prev')
+  .then(cursor => cursor.advance(30))
+  .then(deleteRest(cursor)=>{
+    if(!cursor) return;
+    cursor.delete();
+    return cursor.continue().then(deleteRest)
+  })
+;
+```
+
+
